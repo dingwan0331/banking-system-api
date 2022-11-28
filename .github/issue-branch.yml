@@ -1,0 +1,12 @@
+branchName: "${issue.number}"
+branches:
+  - label: enhancement
+    name: main
+    prefix: feature/
+    prTarget: main
+  - label: bug
+    name: main
+    prefix: hotfix/
+    prTarget: main
+autoCloseIssue: true
+commentMessage: "Branch ${branchName} created for issue: ${issue.title}"
