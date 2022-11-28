@@ -7,6 +7,8 @@ from apps.util.models import TimeStampModel
 class Account(TimeStampModel):
     account_number = models.CharField(max_length=200)
     balance        = models.DecimalField(max_digits=19, decimal_places=4)
+    user           = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    type           = models.ForeignKey('AccountType', on_delete=models.PROTECT)
 
     class Meta():
         db_table = 'accounts'
@@ -24,6 +26,7 @@ class TransactionHistory(models.Model):
     is_withdrawal = models.BooleanField()
     timestamp     = models.DateTimeField(auto_now_add=True)
     summary       = models.CharField(max_length=50)
+    account       = models.ForeignKey('Account', on_delete=models.PROTECT)
 
     class Meta():
         db_table = 'transaction_histories'
