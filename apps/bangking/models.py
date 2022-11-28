@@ -17,3 +17,13 @@ class AccountType(models.Model):
 
     class Meta():
         db_table = 'account_types'
+
+class TransactionHistory(models.Model):
+    amount        = models.DecimalField(max_digits=19, decimal_places=4)
+    balance       = models.DecimalField(max_digits=19, decimal_places=4)
+    is_withdrawal = models.BooleanField()
+    timestamp     = models.DateTimeField(auto_now_add=True)
+    summary       = models.CharField(max_length=50)
+
+    class Meta():
+        db_table = 'transaction_histories'
