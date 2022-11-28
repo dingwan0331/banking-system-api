@@ -10,3 +10,10 @@ class Account(TimeStampModel):
 
     class Meta():
         db_table = 'accounts'
+
+class AccountType(models.Model):
+    id   = models.SmallAutoField(primary_key=True)
+    name = models.CharField(max_length=10)
+
+    class Meta():
+        db_table = 'account_types'
