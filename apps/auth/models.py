@@ -5,7 +5,7 @@ from apps.util.models import TimeStampModel
 class User(TimeStampModel):
     name     = models.CharField(max_length=10)
     password = models.BinaryField(max_length=60)
-    ssl      = models.CharField(max_length=60)
+    ssn      = models.CharField(max_length=60)
 
     class Meta():
         db_table = 'users'
