@@ -8,6 +8,24 @@ from django.http  import JsonResponse
 
 from .models         import User
 
+class UserView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            name, ssn, password = data.get('name'), data.get('ssn'), data.get('password')
+
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
+
+            User.objects.create(
+                name     = name,
+                ssn      = ssn,
+                password = hashed_password
+            )
+
+            return JsonResponse({'meesage' : 'Success'}, status=201)
+        except Exception:
+            return JsonResponse({'message' : 'Server Error'}, status=500)
+
 class SigninView(View):
     def post(self, request):
         try:
