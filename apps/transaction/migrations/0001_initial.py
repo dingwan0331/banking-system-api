@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 ('is_withdrawal', models.BooleanField()),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
                 ('summary', models.CharField(max_length=50)),
-                ('account', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='bangking.account')),
+                ('account', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='transaction.account')),
             ],
             options={
                 'db_table': 'transaction_histories',
@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='account',
             name='type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='bangking.accounttype'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='transaction.accounttype'),
         ),
         migrations.AddField(
             model_name='account',
