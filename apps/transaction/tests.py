@@ -190,3 +190,13 @@ class DepositViewTest(TestCase):
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 400)
+
+    def test_deposit_fail_case_without_access_token(self):
+        headers = {'content_type' : 'application/json'}
+
+        response = client.post('/transactions/deposit',  **headers)
+
+        expected_response = {'message': 'Invalid token'}
+
+        self.assertEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, 401)
