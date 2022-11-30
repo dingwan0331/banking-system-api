@@ -84,3 +84,22 @@ class DepositViewTest(TestCase):
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 201)
+
+    def test_deposit_fail_case_wrong_password(self):
+        request_body = { 
+            'account_id' : 1,
+            'password'   : '1231',
+            'amount'     : 10000,
+        }
+
+        headers = {
+            'HTTP_Authorization' : access_token,
+            'content_type'       :'application/json'
+        }
+
+        response = client.post('/transactions/deposit', request_body, **headers)
+
+        expected_response = {'message': 'Invalid password'}
+
+        self.assertEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, 401)
