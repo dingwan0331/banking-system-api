@@ -136,3 +136,21 @@ class DepositViewTest(TestCase):
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 403)
+
+    def test_deposit_fail_case_key_error_without_amount(self):
+        request_body = { 
+            'account_id' : 2,
+            'password'   : '1231',
+        }
+
+        headers = {
+            'HTTP_Authorization' : access_token,
+            'content_type'       :'application/json'
+        }
+
+        response = client.post('/transactions/deposit', request_body, **headers)
+
+        expected_response = {'message': 'Key error'}
+
+        self.assertEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, 400)
