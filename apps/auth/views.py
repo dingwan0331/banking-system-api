@@ -6,7 +6,8 @@ import jwt
 from django.views import View
 from django.http  import JsonResponse
 
-from .models         import User
+from .models              import User
+from config.settings.base import SECRET_KEY
 
 class UserView(View):
     def post(self, request):
@@ -37,7 +38,7 @@ class SigninView(View):
             if not bcrypt.checkpw(password.encode('utf-8'), user.password):
                 return JsonResponse({"message" : "Password Invalid"}, status=401)
 
-            access_token = jwt.encode({'id':user.id}, 'SECRET_KEY')
+            access_token = jwt.encode({'id':user.id}, SECRET_KEY)
 
             return JsonResponse({'access_token' : access_token}, status=200)
 
