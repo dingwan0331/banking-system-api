@@ -5,9 +5,9 @@ from decimal import *
 
 from django.test import TestCase, Client
 
-from .models              import Transaction, Account, AccountType
-from ..auth.models        import User
-from config.settings.base import SECRET_KEY
+from apps.transaction.models import Transaction, Account, AccountType
+from apps.auth.models        import User
+from config.settings.base    import SECRET_KEY
 
 client       = Client()
 balance      = Decimal('100000.0000')

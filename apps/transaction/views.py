@@ -7,8 +7,8 @@ from django.http  import JsonResponse
 from django.utils import timezone
 from django.db    import transaction
 
-from .models      import Transaction, Account
-from ..util.token import validate_token
+from apps.transaction.models import Transaction, Account
+from apps.util.token         import validate_token
 
 class DepositView(View):
     @validate_token
