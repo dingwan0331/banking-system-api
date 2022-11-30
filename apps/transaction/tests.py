@@ -5,8 +5,9 @@ from decimal import *
 
 from django.test import TestCase, Client
 
-from .models       import Transaction, Account, AccountType
-from ..auth.models import User
+from .models              import Transaction, Account, AccountType
+from ..auth.models        import User
+from config.settings.base import SECRET_KEY
 
 balance = Decimal('100000.0000')
 
@@ -40,7 +41,7 @@ class DepositViewTest(TestCase):
 
     def test_deposit_success_case(self):
         client       = Client()
-        access_token = jwt.encode({'id':1},'SECRET_KEY')
+        access_token = jwt.encode({'id':1}, SECRET_KEY)
         
         request_body = { 
             'account_id' : 1,
