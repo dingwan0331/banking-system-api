@@ -24,8 +24,7 @@ class Transaction(models.Model):
     amount        = models.DecimalField(max_digits=19, decimal_places=4)
     balance       = models.DecimalField(max_digits=19, decimal_places=4)
     is_withdrawal = models.BooleanField()
-    time          = models.PositiveIntegerField()
-    date          = models.PositiveIntegerField()
+    timestamp     = models.PositiveBigIntegerField()
     summary       = models.CharField(max_length=20)
     account       = models.ForeignKey('Account', on_delete=models.PROTECT)
 
