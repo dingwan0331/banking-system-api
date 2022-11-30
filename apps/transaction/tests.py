@@ -19,8 +19,14 @@ class DepositViewTest(TestCase):
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         sample_binary = b'111'
         
-        User.objects.create(
+        user1 = User.objects.create(
             name     = '홍길동',
+            ssn      = sample_binary,
+            password = hashed_password
+            )
+
+        user2 = User.objects.create(
+            name     = '백병동',
             ssn      = sample_binary,
             password = hashed_password
             )
@@ -32,7 +38,14 @@ class DepositViewTest(TestCase):
             password       = hashed_password,
             balance        = balance,
             type_id        = 1,
-            user_id        = 1
+            user           = user1
+        )
+        Account.objects.create(
+            account_number = sample_binary,
+            password       = hashed_password,
+            balance        = balance,
+            type_id        = 1,
+            user           = user2
         )
     
     def tearDown(self):
@@ -103,3 +116,23 @@ class DepositViewTest(TestCase):
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 401)
+
+    
+    def test_deposit_fail_case_dont_have_permission(self):
+        request_body = { 
+            'account_id' : 2,
+            'password'   : '1231',
+            'amount'     : 10000,
+        }
+
+        headers = {
+            'HTTP_Authorization' : access_token,
+            'content_type'       :'application/json'
+        }
+
+        response = client.post('/transactions/deposit', request_body, **headers)
+
+        expected_response = {'message': 'Dont have permission'}
+
+        self.assertEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, 403)
