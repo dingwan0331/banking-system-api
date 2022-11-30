@@ -1,6 +1,6 @@
-from django.urls import path, include
+from django.urls import path
 
-from .views import DepositView
+from apps.transaction.views import DepositView
 
 urlpatterns = [
     path('/deposit', DepositView.as_view())

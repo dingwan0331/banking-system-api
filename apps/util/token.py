@@ -2,7 +2,7 @@ import jwt
 
 from django.http import JsonResponse
 
-from ..auth.models        import User
+from apps.auth.models        import User
 from config.settings.base import SECRET_KEY
 
 def validate_token(func):
