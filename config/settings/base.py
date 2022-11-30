@@ -1,6 +1,6 @@
-
-
 from pathlib import Path
+
+from my_settings import SECRET_KEY
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -41,3 +41,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+SECRET_KEY = SECRET_KEY
