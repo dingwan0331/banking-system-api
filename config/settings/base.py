@@ -11,8 +11,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.auth',
-    'apps.transaction',
+    'apps.auth.apps.AuthConfig',
+    'apps.transaction.apps.TransactionConfig',
     'apps.util'
 ]
 
