@@ -69,7 +69,7 @@ class TransactionView(View):
                 transaction_row = Transaction.objects.create(
                     amount        = amount,
                     balance       = balacne,
-                    timestamp     = timezone.now().timestamp(),
+                    timestamp     = timezone.now().timestamp() * 1000000,
                     is_withdrawal = is_withdrawal,
                     summary       = summary,
                     account_id    = account_id
