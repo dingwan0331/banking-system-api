@@ -1,4 +1,5 @@
 import json
+import re
 
 import bcrypt
 
@@ -15,20 +16,43 @@ class TransactionView(View):
     def post(self, request):
         '''
         request = {
-            account_id: int,
+            account_id: str,
             password: str,
             summary: str,
-            amount: int,
+            amount: str,
+            is_withdrawal: boolean
         }
         '''
         try:
             data = json.loads(request.body)
             user = request.user
 
-            account_id = data['account_id']
-            password   = data['password']
-            amount     = data['amount']
-            summary    = data.get('summary',user.name)
+            account_id    = data['account_id']
+            password      = data['password']
+            is_withdrawal = data['is_withdrawal']
+            amount        = data['amount']
+            summary       = data.get('summary',user.name)
+
+            ACCOUNT_ID_REGEX = '^[1-9]+[0-9]*$'
+            PASSWORD_REGEX   = '\d{4}'
+            AMOUNT_REGEX     = '^[1-9]+(\.?[0-9]+)?$'
+                
+            if not re.fullmatch(AMOUNT_REGEX,amount):
+                return JsonResponse({'message' : 'Invalid amount'}, status=400)
+            
+            if not re.fullmatch(ACCOUNT_ID_REGEX, account_id):
+                return JsonResponse({'message' : 'Invalid account_id'})
+
+            if type(is_withdrawal) != bool:
+                return JsonResponse({'message' : 'Invalid is_withdrawal'})
+            
+            if type(summary) != str:
+                return JsonResponse({'message' : 'Invalid summary'})
+
+            if not re.fullmatch(PASSWORD_REGEX,password):
+                return JsonResponse({'message' : 'Invalid password'})
+
+            signed_amount = -int(amount) if is_withdrawal else int(amount)
             
             with transaction.atomic(using='default'):
                 account = Account.objects.get(id = account_id)
@@ -39,18 +63,23 @@ class TransactionView(View):
                 if not bcrypt.checkpw(password.encode('utf-8') , account.password):
                     return JsonResponse({'message' : 'Invalid password'}, status=401)
 
-                deposit = Transaction.objects.create(
+                balacne = account.balance + signed_amount
+
+                if balacne < 0:
+                    return JsonResponse({'message' : 'Insufficient balance'})
+
+                transaction_row = Transaction.objects.create(
                     amount        = amount,
-                    balance       = account.balance + amount,
+                    balance       = balacne,
                     timestamp     = timezone.now().timestamp(),
-                    is_withdrawal = False,
+                    is_withdrawal = is_withdrawal,
                     summary       = summary,
                     account_id    = account_id
                 )
-                account.balance = deposit.balance
+                account.balance = transaction_row.balance
                 account.save()
 
-            result = {'Balance after transaction': account.balance, 'Transaction amount': amount}
+            result = {'Balance after transaction': account.balance, 'Transaction amount': transaction_row.amount}
 
             return JsonResponse(result, status=201)
 
