@@ -10,7 +10,7 @@ from django.db    import transaction
 from apps.transaction.models import Transaction, Account
 from apps.util.token         import validate_token
 
-class DepositView(View):
+class TransactionView(View):
     @validate_token
     def post(self, request):
         '''
