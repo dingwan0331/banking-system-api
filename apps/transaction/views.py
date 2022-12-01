@@ -3,10 +3,13 @@ import re
 
 import bcrypt
 
-from django.views import View
-from django.http  import JsonResponse
-from django.utils import timezone
-from django.db    import transaction
+from datetime import datetime
+
+from django.views     import View
+from django.http      import JsonResponse
+from django.utils     import timezone
+from django.db        import transaction
+from django.db.models import Q
 
 from apps.transaction.models import Transaction, Account
 from apps.util.token         import validate_token
@@ -65,6 +68,7 @@ class TransactionView(View):
 
                 if balacne < 0:
                     return JsonResponse({'message' : 'Insufficient balance'})
+                print(timezone.now().timestamp())
 
                 transaction_row = Transaction.objects.create(
                     amount        = amount,
@@ -91,3 +95,70 @@ class TransactionView(View):
         except Exception as e:
             print(e)
             return JsonResponse({'message':'Server error'}, status=500)
+    
+    @validate_token
+    def get(self, request, account_id):
+        '''
+        request = {
+            transaction-type : deposit, withdrawal, all
+            order_key  : recent, oldest
+            offset     : str(positive_int)
+            limit      : str(positive_int)
+            start_date : ex) '2002-02-02'
+            end_date   : ex) '2002-02-02'
+        }
+        '''
+        try:
+            start_date       = request.GET.get('start-date')
+            end_date         = request.GET.get('end-date', timezone.now().strftime('%Y-%m-%d'))
+            order_by         = request.GET.get('order-key', 'recent')
+            offset           = request.GET.get('offset', '0')
+            limit            = request.GET.get('limist', '100')
+            transaction_type = request.GET.get('transaction-type', 'all')
+
+            order_set = {
+                'recent' : '-timestamp',
+                'oldest' : 'timestamp'
+            }
+
+            q = Q(account_id=account_id)
+
+            if transaction_type == 'all':
+                pass
+            elif transaction_type:
+                q &= Q(is_withdrawal = transaction_type=='withdrawal')
+
+            DATE_REGEX = '(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])'
+
+            if start_date:
+                if not re.fullmatch(DATE_REGEX, start_date):
+                    return JsonResponse({'message' : 'Invalid start date'})
+
+                start_date = datetime.strptime(start_date, "%Y-%m-%d").timestamp() * 1000000
+
+                q &= Q(timestamp__gte=start_date)
+
+            if end_date:
+                if not re.fullmatch(DATE_REGEX, end_date):
+                    return JsonResponse({'message' : 'Invalid start date'})
+
+                end_date = datetime.strptime(end_date, "%Y-%m-%d").timestamp() * 1000000
+
+                q &= Q(timestamp__gte=end_date)
+
+            transaction_rows = Transaction.objects.filter(q).order_by(order_set[order_by])[int(offset):int(limit)]
+
+            result = [
+                {
+                    'amount'        : transaction.amount,
+                    'balance'       : transaction.balance,
+                    'summary'       : transaction.summary,
+                    'timestamp'     : timezone.make_aware(datetime.fromtimestamp(transaction.timestamp/1000000)),
+                    'is_withdrawal' : transaction.is_withdrawal
+                } for transaction in transaction_rows
+            ]
+
+            return JsonResponse({'transactions':result}, status=200)
+        except Exception as e:
+            print(e)
+            return JsonResponse({'aga':'agag'},status=200)
