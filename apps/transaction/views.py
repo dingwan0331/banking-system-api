@@ -3,8 +3,6 @@ import re
 
 import bcrypt
 
-from datetime import datetime
-
 from django.views     import View
 from django.http      import JsonResponse
 from django.utils     import timezone
@@ -13,6 +11,7 @@ from django.db.models import Q
 
 from apps.transaction.models import Transaction, Account
 from apps.util.token         import validate_token
+from apps.util.transforms  import TimeTransform
 
 class TransactionView(View):
     @validate_token
@@ -68,12 +67,11 @@ class TransactionView(View):
 
                 if balacne < 0:
                     return JsonResponse({'message' : 'Insufficient balance'})
-                print(timezone.now().timestamp())
 
                 transaction_row = Transaction.objects.create(
                     amount        = amount,
                     balance       = balacne,
-                    timestamp     = timezone.now().timestamp() * 1000000,
+                    timestamp     = TimeTransform().get_now('int_unix_time'),
                     is_withdrawal = is_withdrawal,
                     summary       = summary,
                     account_id    = account_id
@@ -110,7 +108,7 @@ class TransactionView(View):
         '''
         try:
             start_date       = request.GET.get('start-date')
-            end_date         = request.GET.get('end-date', timezone.now().strftime('%Y-%m-%d'))
+            end_date         = request.GET.get('end-date', TimeTransform().get_now('str_date'))
             order_by         = request.GET.get('order-key', 'recent')
             offset           = request.GET.get('offset', '0')
             limit            = request.GET.get('limist', '100')
@@ -134,7 +132,7 @@ class TransactionView(View):
                 if not re.fullmatch(DATE_REGEX, start_date):
                     return JsonResponse({'message' : 'Invalid start date'})
 
-                start_date = datetime.strptime(start_date, "%Y-%m-%d").timestamp() * 1000000
+                start_date = TimeTransform(start_date, 'str_date').unix_time_to_int()
 
                 q &= Q(timestamp__gte=start_date)
 
@@ -142,7 +140,7 @@ class TransactionView(View):
                 if not re.fullmatch(DATE_REGEX, end_date):
                     return JsonResponse({'message' : 'Invalid start date'})
 
-                end_date = datetime.strptime(end_date, "%Y-%m-%d").timestamp() * 1000000
+                end_date = TimeTransform(end_date, 'str_date').unix_time_to_int()
 
                 q &= Q(timestamp__gte=end_date)
 
@@ -153,7 +151,7 @@ class TransactionView(View):
                     'amount'        : transaction.amount,
                     'balance'       : transaction.balance,
                     'summary'       : transaction.summary,
-                    'timestamp'     : timezone.make_aware(datetime.fromtimestamp(transaction.timestamp/1000000)),
+                    'timestamp'     : TimeTransform(transaction.timestamp, 'int_unix_time').make_aware(),
                     'is_withdrawal' : transaction.is_withdrawal
                 } for transaction in transaction_rows
             ]
