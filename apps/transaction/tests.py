@@ -193,6 +193,24 @@ class TransactionViewTest(TestCase):
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 400)
 
+    def test_deposit_fail_case_key_error_without_is_withdrawal(self):
+        request_body = {
+            'amount'     : '10000',
+            'password'   : '1231',
+        }
+
+        headers = {
+            'HTTP_Authorization' : access_token,
+            'content_type'       :'application/json'
+        }
+
+        response = client.post('/accounts/1/transactions', request_body, **headers)
+
+        expected_response = {'message': 'Key error'}
+
+        self.assertEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, 400)
+
     def test_deposit_fail_case_without_access_token(self):
         headers = {'content_type' : 'application/json'}
 
