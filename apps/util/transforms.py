@@ -1,6 +1,9 @@
-from datetime import datetime
+import re
+
+from datetime import datetime, timedelta
 
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 class TimeTransform:
     def __init__(self, time='now', type='unix_time'):
@@ -38,3 +41,66 @@ class TimeTransform:
             return datetime.fromtimestamp(now)
         else:
             raise TypeError('Unsupported type')
+
+class GetTransactionsQueryTransform:
+    __order_set        = {'recent' : '-timestamp', 'oldest' : 'timestamp'}
+    __transaction_type = ['deposit', 'withdrawal', 'all']
+    
+    def __init__(self, query):
+        self.start_date       = query.get('start-date')
+        self.end_date         = query.get('end-date')
+        self.order_by         = query.get('order-key', 'recent')
+        self.offset           = query.get('offset', '0')
+        self.limit            = query.get('limist', '30')
+        self.transaction_type = query.get('transaction-type', 'all')
+
+        self.translate()
+
+    def translate(self):
+        self.__set_offset()
+        self.__set_limit()
+        self.__set_order_by()
+        self.__validate_transaction_type()
+        self.__set_start_date()
+        self.__set_end_date()
+
+    def __set_offset(self):
+        OFFSEET_REGEX = '\d'
+        if not re.fullmatch(OFFSEET_REGEX, self.offset):
+            raise ValidationError('Invalid offset')
+        
+        self.offset = int(self.offset)
+    
+    def __set_limit(self):
+        LIMIT_REGEX = '^[^0]\d*'
+
+        if not re.fullmatch(LIMIT_REGEX, self.limit):
+            raise ValidationError('Invalid limit')
+
+        self.limit = int(self.limit)
+    
+    def __set_order_by(self):
+        try:
+            self.order_by = self.__order_set[self.order_by]
+        except KeyError:
+            raise ValidationError('Invalid order key')
+
+    def __validate_transaction_type(self):
+        if self.transaction_type not in self.__transaction_type:
+            raise ValidationError('Invalid transaction type')
+    
+    def __set_start_date(self):
+        DATE_REGEX = '(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])'
+        if not self.start_date:
+            self.start_date = (TimeTransform().get_now('datetime') - timedelta(days=90)).strftime('%Y-%m-%d')
+            
+        if not re.fullmatch(DATE_REGEX, self.start_date):
+            raise ValidationError('Invalid start date')
+            
+    def __set_end_date(self):
+        DATE_REGEX = '(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])'
+        if not self.end_date:
+            self.end_date = TimeTransform().get_now('str_date')
+
+        if not re.fullmatch(DATE_REGEX, self.end_date):
+            raise ValidationError('Invalid end date')
