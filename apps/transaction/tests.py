@@ -156,25 +156,6 @@ class TransactionViewTest(TestCase):
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 400)
 
-    # def test_deposit_fail_case_key_error_without_account_id(self):
-    #     request_body = { 
-    #         'password'      : '1231',
-    #         'amount'        : '10000',
-    #         'is_withdrawal' : False
-    #     }
-
-    #     headers = {
-    #         'HTTP_Authorization' : access_token,
-    #         'content_type'       :'application/json'
-    #     }
-
-    #     response = client.post('/transactions', request_body, **headers)
-
-        # expected_response = {'message': 'Key error'}
-
-        # self.assertEqual(response.json(), expected_response)
-        # self.assertEqual(response.status_code, 400)
-
     def test_deposit_fail_case_key_error_without_password(self):
         request_body = {
             'amount'        : '10000',
@@ -240,3 +221,19 @@ class TransactionViewTest(TestCase):
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 400)
+
+    def test_deposit_fail_case_path_params_not_int(self):
+        request_body = { 
+            'password'      : '1231',
+            'amount'        : '10000',
+            'is_withdrawal' : False
+        }
+
+        headers = {
+            'HTTP_Authorization' : access_token,
+            'content_type'       :'application/json'
+        }
+
+        response = client.post('/accounts/asa/transactions', request_body, **headers)
+
+        self.assertEqual(response.status_code, 404)
