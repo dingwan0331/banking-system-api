@@ -12,7 +12,7 @@ from apps.util.token         import validate_token
 
 class TransactionView(View):
     @validate_token
-    def post(self, request):
+    def post(self, request, account_id):
         '''
         request = {
             account_id: int,
@@ -24,8 +24,7 @@ class TransactionView(View):
         try:
             data = json.loads(request.body)
             user = request.user
-
-            account_id = data['account_id']
+            
             password   = data['password']
             amount     = data['amount']
             summary    = data.get('summary',user.name)
