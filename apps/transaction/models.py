@@ -30,3 +30,4 @@ class Transaction(models.Model):
 
     class Meta():
         db_table = 'transactions'
+        index_together = ['account', 'timestamp']
