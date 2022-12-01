@@ -5,13 +5,12 @@ import bcrypt
 
 from django.views     import View
 from django.http      import JsonResponse
-from django.utils     import timezone
 from django.db        import transaction
 from django.db.models import Q
 
 from apps.transaction.models import Transaction, Account
 from apps.util.token         import validate_token
-from apps.util.transforms  import TimeTransform
+from apps.util.transforms    import TimeTransform, GetTransactionsQueryTransform
 
 class TransactionView(View):
     @validate_token
@@ -107,44 +106,32 @@ class TransactionView(View):
         }
         '''
         try:
-            start_date       = request.GET.get('start-date')
-            end_date         = request.GET.get('end-date', TimeTransform().get_now('str_date'))
-            order_by         = request.GET.get('order-key', 'recent')
-            offset           = request.GET.get('offset', '0')
-            limit            = request.GET.get('limist', '100')
-            transaction_type = request.GET.get('transaction-type', 'all')
+            query = GetTransactionsQueryTransform(request.GET)
+            
+            offset     = query.offset
+            limit      = query.limit
+            order_by   = query.order_by
+            start_date = query.start_date
+            end_date   = query.end_date
+            transaction_type = query.transaction_type
 
-            order_set = {
-                'recent' : '-timestamp',
-                'oldest' : 'timestamp'
-            }
+            account = Account.objects.get(id = account_id)
 
+            if account.user_id != request.user.id:
+                return JsonResponse({'message' : 'Dont have permission'}, status=403)
+            
             q = Q(account_id=account_id)
+            
+            if transaction_type != 'all':
+                q &= Q(is_withdrawal = transaction_type == 'withdrawal')
+            
+            start_date = TimeTransform(start_date, 'str_date').unix_time_to_int()
+            end_date = TimeTransform(end_date, 'str_date').unix_time_to_int()
 
-            if transaction_type == 'all':
-                pass
-            elif transaction_type:
-                q &= Q(is_withdrawal = transaction_type=='withdrawal')
+            q &= Q(timestamp__gte=start_date) &Q(timestamp__lte=end_date)
+            print(q)
 
-            DATE_REGEX = '(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])'
-
-            if start_date:
-                if not re.fullmatch(DATE_REGEX, start_date):
-                    return JsonResponse({'message' : 'Invalid start date'})
-
-                start_date = TimeTransform(start_date, 'str_date').unix_time_to_int()
-
-                q &= Q(timestamp__gte=start_date)
-
-            if end_date:
-                if not re.fullmatch(DATE_REGEX, end_date):
-                    return JsonResponse({'message' : 'Invalid start date'})
-
-                end_date = TimeTransform(end_date, 'str_date').unix_time_to_int()
-
-                q &= Q(timestamp__gte=end_date)
-
-            transaction_rows = Transaction.objects.filter(q).order_by(order_set[order_by])[int(offset):int(limit)]
+            transaction_rows = Transaction.objects.filter(q).order_by(order_by)[offset: offset+limit]
 
             result = [
                 {
