@@ -220,3 +220,23 @@ class TransactionViewTest(TestCase):
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 401)
+
+    def test_deposit_fail_case_amount_lower_zero(self):
+        request_body = {
+            'password'      : '1234',
+            'summary'       : '예금하기',
+            'amount'        : '-10000',
+            'is_withdrawal' : False
+            }
+
+        headers = {
+            'HTTP_Authorization' : access_token,
+            'content_type'       :'application/json'
+        }
+
+        response = client.post('/accounts/1/transactions', request_body, **headers)
+
+        expected_response = {'message' : 'Invalid amount'}
+
+        self.assertEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, 400)
