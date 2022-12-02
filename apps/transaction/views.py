@@ -115,11 +115,13 @@ class TransactionView(View):
                 return JsonResponse({'message' : 'Dont have permission'}, status=403)
             
             q = Q(account_id=account_id)
+
+            ONE_DAY = 86400000000
             
             start_date = TimeTransform(start_date, 'str_date').unix_time_to_int()
-            end_date = TimeTransform(end_date, 'str_date').unix_time_to_int()
+            end_date = TimeTransform(end_date, 'str_date').unix_time_to_int() + ONE_DAY
 
-            q &= Q(timestamp__gte=start_date) &Q(timestamp__lte=end_date)
+            q &= Q(timestamp__gte=start_date) & Q(timestamp__lte=end_date)
 
             if transaction_type != 'all':
                 q &= Q(is_withdrawal = transaction_type == 'withdrawal')

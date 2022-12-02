@@ -101,7 +101,7 @@ class GetTransactionsQueryTransform:
     def __set_end_date(self):
         DATE_REGEX = '(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])'
         if not self.end_date:
-            self.end_date = (TimeTransform().get_now('datetime') + relativedelta(days=1)).strftime('%Y-%m-%d')
+            self.end_date = TimeTransform().get_now('str_date')
 
         if not re.fullmatch(DATE_REGEX, self.end_date):
             raise ValidationError('Invalid end date')
