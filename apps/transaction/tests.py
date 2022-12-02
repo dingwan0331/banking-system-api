@@ -71,8 +71,8 @@ class TransactionViewTest(TestCase):
         response = client.post('/accounts/1/transactions', request_body, **headers)
 
         expected_response = {
-            'Balance after transaction' : str(balance + Decimal(request_body['amount'])), 
-            'Transaction amount'        : request_body['amount']
+            'Balance after transaction' : '110000.0000', 
+            'Transaction amount'        : 10000
             }
 
         self.assertEqual(response.json(), expected_response)
@@ -94,8 +94,8 @@ class TransactionViewTest(TestCase):
         response = client.post('/accounts/1/transactions', request_body, **headers)
 
         expected_response = {
-            'Balance after transaction' : str(balance + Decimal(request_body['amount'])), 
-            'Transaction amount'        : request_body['amount']
+            'Balance after transaction' : '110000.0000', 
+            'Transaction amount'        : 10000
             }
 
         self.assertEqual(response.json(), expected_response)
