@@ -1,8 +1,9 @@
 import re
 
-from datetime import datetime, timedelta
+from datetime               import datetime
+from dateutil.relativedelta import relativedelta
 
-from django.utils import timezone
+from django.utils           import timezone
 from django.core.exceptions import ValidationError
 
 class TimeTransform:
@@ -92,7 +93,7 @@ class GetTransactionsQueryTransform:
     def __set_start_date(self):
         DATE_REGEX = '(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])'
         if not self.start_date:
-            self.start_date = (TimeTransform().get_now('datetime') - timedelta(days=90)).strftime('%Y-%m-%d')
+            self.start_date = (TimeTransform().get_now('datetime') - relativedelta(months=3)).strftime('%Y-%m-%d')
             
         if not re.fullmatch(DATE_REGEX, self.start_date):
             raise ValidationError('Invalid start date')
