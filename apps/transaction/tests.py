@@ -153,7 +153,7 @@ class TransactionViewTest(TestCase):
 
         response = client.post('/accounts/1/transactions', request_body, **headers)
 
-        expected_response = {'message': 'Key error'}
+        expected_response = {'message': 'Invalid amount'}
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 400)
@@ -171,7 +171,7 @@ class TransactionViewTest(TestCase):
 
         response = client.post('/accounts/1/transactions', request_body, **headers)
 
-        expected_response = {'message': 'Key error'}
+        expected_response = {'message': 'Invalid password'}
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 400)
@@ -189,7 +189,7 @@ class TransactionViewTest(TestCase):
 
         response = client.post('/accounts/1/transactions', request_body, **headers)
 
-        expected_response = {'message': 'Key error'}
+        expected_response = {'message': 'Invalid is_withdrawal'}
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 400)
