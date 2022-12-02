@@ -3,10 +3,11 @@ import re
 
 import bcrypt
 
-from django.views     import View
-from django.http      import JsonResponse
-from django.db        import transaction
-from django.db.models import Q
+from django.views           import View
+from django.http            import JsonResponse
+from django.db              import transaction
+from django.db.models       import Q
+from django.core.exceptions import ValidationError
 
 from apps.transaction.models import Transaction, Account
 from apps.util.token         import validate_token
@@ -107,6 +108,7 @@ class TransactionView(View):
         '''
         try:
             query = GetTransactionsQueryTransform(request.GET)
+            user  = request.user
             
             offset     = query.offset
             limit      = query.limit
@@ -117,19 +119,18 @@ class TransactionView(View):
 
             account = Account.objects.get(id = account_id)
 
-            if account.user_id != request.user.id:
+            if account.user_id != user.id:
                 return JsonResponse({'message' : 'Dont have permission'}, status=403)
             
             q = Q(account_id=account_id)
-            
-            if transaction_type != 'all':
-                q &= Q(is_withdrawal = transaction_type == 'withdrawal')
             
             start_date = TimeTransform(start_date, 'str_date').unix_time_to_int()
             end_date = TimeTransform(end_date, 'str_date').unix_time_to_int()
 
             q &= Q(timestamp__gte=start_date) &Q(timestamp__lte=end_date)
-            print(q)
+
+            if transaction_type != 'all':
+                q &= Q(is_withdrawal = transaction_type == 'withdrawal')
 
             transaction_rows = Transaction.objects.filter(q).order_by(order_by)[offset: offset+limit]
 
@@ -144,6 +145,14 @@ class TransactionView(View):
             ]
 
             return JsonResponse({'transactions':result}, status=200)
+
+        except ValidationError as e:
+            return JsonResponse({'message': e.message}, status=400)
+        
+        except Account.DoesNotExist:
+            return JsonResponse({'message' : 'Invalid account id'}, status=400)
+
         except Exception as e:
             print(e)
-            return JsonResponse({'aga':'agag'},status=200)
+            return JsonResponse({'message':'Server error'}, status=500)
+        
