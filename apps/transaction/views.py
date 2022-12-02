@@ -1,6 +1,3 @@
-import json
-import re
-
 import bcrypt
 
 from django.views           import View
@@ -12,13 +9,13 @@ from django.core.exceptions import ValidationError
 from apps.transaction.models import Transaction, Account
 from apps.util.token         import validate_token
 from apps.util.transforms    import TimeTransform, GetTransactionsQueryTransform
+from apps.util.validators    import PostTransactionsJsonValidator
 
 class TransactionView(View):
     @validate_token
     def post(self, request, account_id):
         '''
         request = {
-            account_id: str,
             password: str,
             summary: str,
             amount: str,
@@ -26,33 +23,16 @@ class TransactionView(View):
         }
         '''
         try:
-            data = json.loads(request.body)
+            data = PostTransactionsJsonValidator(request.body)
             user = request.user
 
-            password      = data['password']
-            is_withdrawal = data['is_withdrawal']
-            amount        = data['amount']
-            summary       = data.get('summary',user.name)
+            password      = data.password
+            is_withdrawal = data.is_withdrawal
+            amount        = data.amount
+            summary       = data.summary if data.summary else user.last_name + user.first_name
 
-            PASSWORD_REGEX   = '\d{4}'
-            AMOUNT_REGEX     = '^[1-9]+(\.?[0-9]+)?$'
-                
-            if not re.fullmatch(AMOUNT_REGEX,amount):
-                return JsonResponse({'message' : 'Invalid amount'}, status=400)
-            
             if account_id == 0:
-                return JsonResponse({'message' : 'Invalid account_id'})
-
-            if type(is_withdrawal) != bool:
-                return JsonResponse({'message' : 'Invalid is_withdrawal'})
-            
-            if type(summary) != str:
-                return JsonResponse({'message' : 'Invalid summary'})
-
-            if not re.fullmatch(PASSWORD_REGEX,password):
-                return JsonResponse({'message' : 'Invalid password'})
-
-            signed_amount = -int(amount) if is_withdrawal else int(amount)
+                return JsonResponse({'message' : 'Invalid account id'})
             
             with transaction.atomic(using='default'):
                 account = Account.objects.get(id = account_id)
@@ -63,7 +43,7 @@ class TransactionView(View):
                 if not bcrypt.checkpw(password.encode('utf-8') , account.password):
                     return JsonResponse({'message' : 'Invalid password'}, status=401)
 
-                balacne = account.balance + signed_amount
+                balacne = account.balance + amount
 
                 if balacne < 0:
                     return JsonResponse({'message' : 'Insufficient balance'})
@@ -87,8 +67,8 @@ class TransactionView(View):
         except Account.DoesNotExist:
             return JsonResponse({'message' : 'Does not account'}, status=400)
 
-        except KeyError:
-            return JsonResponse({'message' : 'Key error'}, status=400)
+        except ValidationError as e:
+            return JsonResponse({'message' : e.message}, status=400)
 
         except Exception as e:
             print(e)
