@@ -13,14 +13,16 @@ class UserView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            name, ssn, password = data.get('name'), data.get('ssn'), data.get('password')
+            username, password = data.get('username'), data.get('password')
+            first_name, last_name = data.get('first_name'), data.get('last_name')
 
             hashed_password = bcrypt.hashpw(password.encode('utf-8'),bcrypt.gensalt())
 
             User.objects.create(
-                name     = name,
-                ssn      = ssn,
-                password = hashed_password
+                username  = username,
+                password = hashed_password,
+                first_name =first_name, 
+                last_name = last_name
             )
 
             return JsonResponse({'meesage' : 'Success'}, status=201)
