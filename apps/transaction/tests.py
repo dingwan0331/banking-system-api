@@ -20,14 +20,16 @@ class TransactionViewTest(TestCase):
         sample_binary = b'111'
         
         user1 = User.objects.create(
-            name     = '홍길동',
-            ssn      = sample_binary,
-            password = hashed_password
+            first_name = '길동',
+            last_name  = '홍',
+            username   = 'user1',
+            password   = hashed_password
             )
 
         user2 = User.objects.create(
-            name     = '백병동',
-            ssn      = sample_binary,
+            first_name = '병동',
+            last_name  = '백',
+            username   = 'user2',
             password = hashed_password
             )
 
