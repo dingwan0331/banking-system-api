@@ -33,9 +33,9 @@ class SigninView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            ssn, password = data.get('ssn'), data.get('password')
+            username, password = data.get('username'), data.get('password')
 
-            user = User.objects.get(ssn = ssn)
+            user = User.objects.get(username = username)
 
             if not bcrypt.checkpw(password.encode('utf-8'), user.password):
                 return JsonResponse({"message" : "Password Invalid"}, status=401)
