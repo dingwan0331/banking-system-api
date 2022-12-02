@@ -5,6 +5,7 @@ from django.http            import JsonResponse
 from django.db              import transaction
 from django.db.models       import Q
 from django.core.exceptions import ValidationError
+from django.db.utils        import IntegrityError
 
 from apps.transaction.models import Transaction, Account
 from apps.util.token         import validate_token
@@ -48,6 +49,9 @@ class TransactionView(View):
                 if balacne < 0:
                     return JsonResponse({'message' : 'Insufficient balance'})
 
+                user.credit -= amount
+                user.save()
+
                 transaction_row = Transaction.objects.create(
                     amount        = amount,
                     balance       = balacne,
@@ -56,6 +60,7 @@ class TransactionView(View):
                     summary       = summary,
                     account_id    = account_id
                 )
+ 
                 account.balance = transaction_row.balance
                 account.save()
 
@@ -70,8 +75,15 @@ class TransactionView(View):
         except ValidationError as e:
             return JsonResponse({'message' : e.message}, status=400)
 
+        except IntegrityError as e:
+            if str(e) == 'CHECK constraint failed: credit':
+                return JsonResponse({'mesage' : 'Dont have enough credit'}, status=400)
+
+            return JsonResponse({'message':'Server error'}, status=500)
+
         except Exception as e:
-            print(e)
+            
+            print(e.__class__)
             return JsonResponse({'message':'Server error'}, status=500)
     
     @validate_token
