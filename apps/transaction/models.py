@@ -10,7 +10,7 @@ def time_now():
 
 class Account(TimeStampModel):
     account_number = models.BinaryField(max_length=256)
-    balance        = models.DecimalField(max_digits=19, decimal_places=4)
+    balance        = models.DecimalField(max_digits=19, decimal_places=4, default=0)
     password       = models.BinaryField(max_length=60)
     user           = models.ForeignKey('auth.User', on_delete=models.PROTECT)
     type           = models.ForeignKey('AccountType', on_delete=models.PROTECT)
