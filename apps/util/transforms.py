@@ -52,7 +52,7 @@ class GetTransactionsQueryTransform:
         self.end_date         = query.get('end-date')
         self.order_by         = query.get('order-key', 'recent')
         self.offset           = query.get('offset', '0')
-        self.limit            = query.get('limist', '10')
+        self.limit            = query.get('limit', '10')
         self.transaction_type = query.get('transaction-type', 'all')
 
         self.translate()
