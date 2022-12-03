@@ -981,3 +981,13 @@ class GetTransactionsTest(TestCase):
 
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 400)
+
+    def test_fail_case_query_start_date_before_1900(self):
+        headers = {'HTTP_Authorization' : access_token,}
+
+        response = client.get('/accounts/1/transactions?start-date=2022-13-11', **headers)
+
+        expected_response = {'message' : 'Invalid start date'}
+
+        self.assertEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, 400)
