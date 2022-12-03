@@ -16,7 +16,7 @@ class TransactionView(View):
     @validate_token
     def post(self, request, account_id):
         '''
-        request = {
+        request.body = {
             password: str,
             summary: str,
             amount: str,
@@ -81,7 +81,7 @@ class TransactionView(View):
     @validate_token
     def get(self, request, account_id):
         '''
-        request = {
+        request.GET = {
             transaction-type : deposit, withdrawal, all
             order_key  : recent, oldest
             offset     : str(positive_int)
