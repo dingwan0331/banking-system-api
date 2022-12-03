@@ -23,14 +23,16 @@ class TransactionViewTest(TestCase):
             first_name = '길동',
             last_name  = '홍',
             username   = 'user1',
-            password   = hashed_password
+            password   = hashed_password,
+            credit     = 1000000
             )
 
         user2 = User.objects.create(
             first_name = '병동',
             last_name  = '백',
             username   = 'user2',
-            password = hashed_password
+            password   = hashed_password,
+            credit     = 1000000
             )
 
         AccountType.objects.create(name = '일반예금')
@@ -174,7 +176,7 @@ class TransactionViewTest(TestCase):
         expected_response = {'message': 'Invalid password'}
 
         self.assertEqual(response.json(), expected_response)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 401)
 
     def test_deposit_fail_case_key_error_without_is_withdrawal(self):
         request_body = {
