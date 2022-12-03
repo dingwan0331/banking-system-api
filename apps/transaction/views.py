@@ -82,7 +82,7 @@ class TransactionView(View):
 
         except IntegrityError as e:
             if str(e) == 'CHECK constraint failed: credit':
-                return JsonResponse({'mesage' : 'Dont have enough credit'}, status=400)
+                return JsonResponse({'message' : 'Dont have enough credit'}, status=400)
 
             return JsonResponse({'message':'Server error'}, status=500)
 
