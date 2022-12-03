@@ -1,8 +1,12 @@
 from django.db    import models
 
-from apps.util.models import TimeStampModel
+from apps.util.models     import TimeStampModel
+from apps.util.transforms import TimeTransform
 
 # Create your models here.
+def time_now():
+    now = TimeTransform().unix_time_to_int()
+    return now
 
 class Account(TimeStampModel):
     account_number = models.BinaryField(max_length=256)
@@ -28,7 +32,7 @@ class Transaction(models.Model):
     amount        = models.DecimalField(max_digits=19, decimal_places=4)
     balance       = models.DecimalField(max_digits=19, decimal_places=4)
     is_withdrawal = models.BooleanField()
-    timestamp     = models.PositiveBigIntegerField()
+    timestamp     = models.PositiveBigIntegerField(default=time_now)
     summary       = models.CharField(max_length=20)
     account       = models.ForeignKey('Account', on_delete=models.PROTECT)
 
