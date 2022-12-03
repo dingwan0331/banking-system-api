@@ -25,7 +25,7 @@ class TransactionViewTest(TestCase):
             last_name  = '홍',
             username   = 'user1',
             password   = hashed_password,
-            credit     = 1000000
+            credit     = 50000
             )
 
         user2 = User.objects.create(
@@ -33,7 +33,7 @@ class TransactionViewTest(TestCase):
             last_name  = '백',
             username   = 'user2',
             password   = hashed_password,
-            credit     = 1000000
+            credit     = 500000
             )
 
         AccountType.objects.create(name = '일반예금')
@@ -289,6 +289,25 @@ class TransactionViewTest(TestCase):
         self.assertEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.headers['Location'],'/transactions/1')
+
+    def test_deposit_fail_case_amount_over_users_credit(self):
+        request_body = {
+            'password'      : '1234',
+            'amount'        : '50001',
+            'is_withdrawal' : False
+        }
+
+        headers = {
+            'HTTP_Authorization' : access_token,
+            'content_type'       :'application/json'
+        }
+
+        response = client.post('/accounts/1/transactions', request_body, **headers)
+
+        expected_response = {'message' : 'Dont have enough credit'}
+
+        self.assertEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, 400)
 
 class GetTransactionsTest(TestCase):
     def setUp(self):        
