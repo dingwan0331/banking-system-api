@@ -305,7 +305,7 @@ class GetTransactionsTest(TestCase):
         User.objects.all().delete()
         self.freezer.stop()
 
-    def test_success_case_쿼리파라미터_없이_요청(self):
+    def test_success_case_dont_have_query(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions', **headers)
@@ -377,7 +377,7 @@ class GetTransactionsTest(TestCase):
         self.assertEqual(response.json(), {'transactions' : expected_response})
         self.assertEqual(response.status_code, 200)
 
-    def test_success_case_쿼리파라미터_limit_3(self):
+    def test_success_case_query_limit_3(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?limit=3', **headers)
@@ -409,7 +409,7 @@ class GetTransactionsTest(TestCase):
 
         
 
-    def test_success_case_쿼리파라미터_offset_3(self):
+    def test_success_case_query_offset_3(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?offset=3', **headers)
@@ -481,7 +481,7 @@ class GetTransactionsTest(TestCase):
         self.assertEqual(response.json(), {'transactions' : expected_response})
         self.assertEqual(response.status_code, 200)
 
-    def test_success_case_쿼리파라미터_offset_4_limit_2(self):
+    def test_success_case_query_offset_4_limit_2(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?offset=4&limit=2', **headers)
@@ -505,7 +505,7 @@ class GetTransactionsTest(TestCase):
         self.assertEqual(response.json(), {'transactions' : expected_response})
         self.assertEqual(response.status_code, 200)
 
-    def test_success_case_쿼리파라미터_order_key_recent(self):
+    def test_success_case_query_order_key_recent(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?order-key=recent', **headers)
@@ -577,7 +577,7 @@ class GetTransactionsTest(TestCase):
         self.assertEqual(response.json(), {'transactions' : expected_response})
         self.assertEqual(response.status_code, 200)
 
-    def test_success_case_쿼리파라미터_order_key_oldest(self):
+    def test_success_case_query_order_key_oldest(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?order-key=oldest', **headers)
@@ -649,7 +649,7 @@ class GetTransactionsTest(TestCase):
         self.assertEqual(response.json(), {'transactions' : expected_response})
         self.assertEqual(response.status_code, 200)
 
-    def test_success_case_쿼리파라미터_start_date_20221028(self):
+    def test_success_case_query_start_date_20221028(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?start-date=2022-10-28', **headers)
@@ -674,7 +674,7 @@ class GetTransactionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-    def test_success_case_쿼리파라미터_end_date_20221001(self):
+    def test_success_case_query_end_date_20221001(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?end-date=2022-10-01', **headers)
@@ -746,7 +746,7 @@ class GetTransactionsTest(TestCase):
         self.assertEqual(response.json(), {'transactions' : expected_response})
         self.assertEqual(response.status_code, 200)
 
-    def test_success_case_쿼리파라미터_transaction_type_all(self):
+    def test_success_case_query_transaction_type_all(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?transaction-type=all', **headers)
@@ -818,7 +818,7 @@ class GetTransactionsTest(TestCase):
         self.assertEqual(response.json(), {'transactions' : expected_response})
         self.assertEqual(response.status_code, 200)
 
-    def test_success_case_쿼리파라미터_transaction_type_deposit(self):
+    def test_success_case_query_transaction_type_deposit(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?transaction-type=deposit', **headers)
@@ -890,7 +890,7 @@ class GetTransactionsTest(TestCase):
         self.assertEqual(response.json(), {'transactions' : expected_response})
         self.assertEqual(response.status_code, 200)
 
-    def test_success_case_쿼리파라미터_transaction_type_withdrawal(self):
+    def test_success_case_query_transaction_type_withdrawal(self):
         headers = {'HTTP_Authorization' : access_token,}
 
         response = client.get('/accounts/1/transactions?transaction-type=withdrawal', **headers)
