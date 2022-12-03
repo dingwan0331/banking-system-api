@@ -33,6 +33,8 @@ class TransactionView(View):
             amount        = data.amount
             summary       = data.summary if data.summary else user.last_name + user.first_name
 
+            signed_amount =  -amount if is_withdrawal else amount
+
             if account_id == 0:
                 return JsonResponse({'message' : 'Invalid account id'})
             
@@ -45,12 +47,12 @@ class TransactionView(View):
                 if not bcrypt.checkpw(password.encode('utf-8') , account.password):
                     return JsonResponse({'message' : 'Invalid password'}, status=401)
 
-                balance = account.balance + amount
+                balance = account.balance + signed_amount
 
                 if balance < 0:
                     return JsonResponse({'message' : 'Insufficient balance'})
 
-                user.credit -= amount
+                user.credit -= signed_amount
                 user.save()
 
                 transaction_row = Transaction.objects.create(

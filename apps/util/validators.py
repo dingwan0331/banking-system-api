@@ -42,4 +42,4 @@ class PostTransactionsJsonValidator:
         if not re.fullmatch(AMOUNT_REGEX,self.amount):
             raise ValidationError('Invalid amount')
 
-        self.amount = -int(self.amount) if self.is_withdrawal else int(self.amount)
+        self.amount = int(self.amount)
