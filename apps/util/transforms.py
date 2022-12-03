@@ -11,7 +11,7 @@ class TimeTransform:
         self.type = type
 
         if time == 'now':
-            self.unix_time = timezone.now()
+            self.unix_time = timezone.now().timestamp()
         elif type == 'str_date':
             self.unix_time = datetime.strptime(time, "%Y-%m-%d").timestamp()
         elif type == 'int_unix_time':
