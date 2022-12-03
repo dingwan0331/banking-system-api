@@ -267,6 +267,29 @@ class TransactionViewTest(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.headers['Location'],'/transactions/1')
 
+    def test_withdrawal_success_case_without_summary(self):
+        request_body = {
+            'password'      : '1234',
+            'amount'        : '10000',
+            'is_withdrawal' : True
+        }
+
+        headers = {
+            'HTTP_Authorization' : access_token,
+            'content_type'       :'application/json'
+        }
+
+        response = client.post('/accounts/1/transactions', request_body, **headers)
+
+        expected_response = {
+            'Balance after transaction' : '90000.0000', 
+            'Transaction amount'        : 10000
+            }
+
+        self.assertEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.headers['Location'],'/transactions/1')
+
 class GetTransactionsTest(TestCase):
     def setUp(self):        
         self.freezer = freeze_time('2022-10-30')
