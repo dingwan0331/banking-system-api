@@ -3,7 +3,7 @@ import json
 
 from django.core.exceptions import ValidationError
 
-from apps.util.exception import AuthException
+from apps.util.exceptions import AuthException
 
 class PostTransactionsJsonValidator:
     def __init__(self, body_json):
