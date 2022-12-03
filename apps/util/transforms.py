@@ -3,8 +3,9 @@ import re
 from datetime               import datetime
 from dateutil.relativedelta import relativedelta
 
-from django.utils           import timezone
-from django.core.exceptions import ValidationError
+from django.utils import timezone
+
+from apps.util.exceptions import BadRequestException
 
 class TimeTransform:
     def __init__(self, time='now', type='unix_time'):
@@ -68,7 +69,7 @@ class GetTransactionsQueryTransform:
     def __set_offset(self):
         OFFSEET_REGEX = '\d'
         if not re.fullmatch(OFFSEET_REGEX, self.offset):
-            raise ValidationError('Invalid offset')
+            raise BadRequestException('Invalid offset')
         
         self.offset = int(self.offset)
     
@@ -76,7 +77,7 @@ class GetTransactionsQueryTransform:
         LIMIT_REGEX = '^[^0]\d*'
 
         if not re.fullmatch(LIMIT_REGEX, self.limit):
-            raise ValidationError('Invalid limit')
+            raise BadRequestException('Invalid limit')
 
         self.limit = int(self.limit)
     
@@ -84,11 +85,11 @@ class GetTransactionsQueryTransform:
         try:
             self.order_by = self.__order_set[self.order_by]
         except KeyError:
-            raise ValidationError('Invalid order key')
+            raise BadRequestException('Invalid order key')
 
     def __validate_transaction_type(self):
         if self.transaction_type not in self.__transaction_type:
-            raise ValidationError('Invalid transaction type')
+            raise BadRequestException('Invalid transaction type')
     
     def __set_start_date(self):
         DATE_REGEX = '(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])'
@@ -96,7 +97,7 @@ class GetTransactionsQueryTransform:
             self.start_date = (TimeTransform().get_now('datetime') - relativedelta(months=3)).strftime('%Y-%m-%d')
             
         if not re.fullmatch(DATE_REGEX, self.start_date):
-            raise ValidationError('Invalid start date')
+            raise BadRequestException('Invalid start date')
             
     def __set_end_date(self):
         DATE_REGEX = '(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])'
@@ -104,4 +105,4 @@ class GetTransactionsQueryTransform:
             self.end_date = TimeTransform().get_now('str_date')
 
         if not re.fullmatch(DATE_REGEX, self.end_date):
-            raise ValidationError('Invalid end date')
+            raise BadRequestException('Invalid end date')

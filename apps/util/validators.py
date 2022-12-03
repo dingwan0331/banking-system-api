@@ -1,9 +1,7 @@
 import re
 import json
 
-from django.core.exceptions import ValidationError
-
-from apps.util.exceptions import AuthException
+from apps.util.exceptions import AuthException, BadRequestException
 
 class PostTransactionsJsonValidator:
     def __init__(self, body_json):
@@ -30,16 +28,16 @@ class PostTransactionsJsonValidator:
 
     def __validate_is_withdrawal(self):
         if type(self.is_withdrawal) != bool:
-            raise ValidationError('Invalid is_withdrawal')
+            raise BadRequestException('Invalid is_withdrawal')
     
     def __validate_summary(self):
         if self.summary and type(self.summary) != str:
-            raise ValidationError('Invalid summary')
+            raise BadRequestException('Invalid summary')
 
     def __validate_amount(self):
         AMOUNT_REGEX = '^[1-9]+(\.?[0-9]+)?$'
             
         if not re.fullmatch(AMOUNT_REGEX,self.amount):
-            raise ValidationError('Invalid amount')
+            raise BadRequestException('Invalid amount')
 
         self.amount = int(self.amount)

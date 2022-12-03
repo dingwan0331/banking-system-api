@@ -4,14 +4,13 @@ from django.views           import View
 from django.http            import JsonResponse
 from django.db              import transaction
 from django.db.models       import Q
-from django.core.exceptions import ValidationError
 from django.db.utils        import IntegrityError
 
 from apps.transaction.models import Transaction, Account
 from apps.util.token         import validate_token
 from apps.util.transforms    import TimeTransform, GetTransactionsQueryTransform
 from apps.util.validators    import PostTransactionsJsonValidator
-from apps.util.exception     import AuthException
+from apps.util.exceptions    import AuthException, BadRequestException, PermissionException
 
 class TransactionView(View):
     @validate_token
@@ -36,21 +35,21 @@ class TransactionView(View):
             signed_amount =  -amount if is_withdrawal else amount
 
             if account_id == 0:
-                return JsonResponse({'message' : 'Invalid account id'})
+                raise BadRequestException('Invalid account id')
             
             with transaction.atomic(using='default'):
                 account = Account.objects.get(id = account_id)
 
                 if account.user_id != user.id:
-                    return JsonResponse({'message' : 'Dont have permission'}, status=403)
+                    raise PermissionException('Dont have permission')
 
                 if not bcrypt.checkpw(password.encode('utf-8') , account.password):
-                    return JsonResponse({'message' : 'Invalid password'}, status=401)
+                    raise AuthException('Invalid password')
 
                 balance = account.balance + signed_amount
 
                 if balance < 0:
-                    return JsonResponse({'message' : 'Insufficient balance'})
+                    raise PermissionException('Insufficient balance')
 
                 user.credit -= signed_amount
                 user.save()
@@ -72,22 +71,12 @@ class TransactionView(View):
             return JsonResponse(result,headers = headers, status=201)
 
         except Account.DoesNotExist:
-            return JsonResponse({'message' : 'Does not account'}, status=400)
-
-        except ValidationError as e:
-            return JsonResponse({'message' : e.message}, status=400)
-        
-        except AuthException as e:
-            return JsonResponse({'message' : e.message}, status = e.status)
+            raise BadRequestException('Does not account')
 
         except IntegrityError as e:
             if str(e) == 'CHECK constraint failed: credit':
-                return JsonResponse({'message' : 'Dont have enough credit'}, status=400)
-
-            return JsonResponse({'message':'Server error'}, status=500)
-
-        except Exception as e:
-            return JsonResponse({'message':'Server error'}, status=500)
+                raise BadRequestException('Dont have enough credit')
+            raise
     
     @validate_token
     def get(self, request, account_id):
@@ -115,7 +104,7 @@ class TransactionView(View):
             account = Account.objects.get(id = account_id)
 
             if account.user_id != user.id:
-                return JsonResponse({'message' : 'Dont have permission'}, status=403)
+                raise PermissionException('Dont have permission')
             
             q = Q(account_id=account_id)
 
@@ -142,13 +131,6 @@ class TransactionView(View):
             ]
 
             return JsonResponse({'transactions':result}, status=200)
-
-        except ValidationError as e:
-            return JsonResponse({'message': e.message}, status=400)
         
         except Account.DoesNotExist:
-            return JsonResponse({'message' : 'Invalid account id'}, status=400)
-
-        except Exception as e:
-            return JsonResponse({'message':'Server error'}, status=500)
-        
+            raise BadRequestException('Invalid account id')
