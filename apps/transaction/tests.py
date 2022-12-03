@@ -576,3 +576,75 @@ class GetTransactionsTest(TestCase):
 
         self.assertEqual(response.json(), {'transactions' : expected_response})
         self.assertEqual(response.status_code, 200)
+
+    def test_success_case_쿼리파라미터_order_key_oldest(self):
+        headers = {'HTTP_Authorization' : access_token,}
+
+        response = client.get('/accounts/1/transactions?order-key=oldest', **headers)
+
+        expected_response = [
+                {
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000000000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-07-30T00:00:00+09:00',
+                    'is_withdrawal' : True
+                },{
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000010000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-07-31T00:00:00+09:00',
+                    'is_withdrawal' : False
+                },{
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000000000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-08-01T00:00:00+09:00',
+                    'is_withdrawal' : True
+                },{
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000010000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-08-02T00:00:00+09:00',
+                    'is_withdrawal' : False
+                },{
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000000000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-08-03T00:00:00+09:00',
+                    'is_withdrawal' : True
+                },{
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000010000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-08-04T00:00:00+09:00',
+                    'is_withdrawal' : False
+                },{
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000000000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-08-05T00:00:00+09:00',
+                    'is_withdrawal' : True
+                },{
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000010000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-08-06T00:00:00+09:00',
+                    'is_withdrawal' : False
+                },{
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000000000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-08-07T00:00:00+09:00',
+                    'is_withdrawal' : True
+                },{
+                    'amount'        : '10000.0000',
+                    'balance'       : '10000000010000.0000',
+                    'summary'       : '홍길동',
+                    'timestamp'     : '2022-08-08T00:00:00+09:00',
+                    'is_withdrawal' : False
+                },
+            ]
+
+        self.assertEqual(response.json(), {'transactions' : expected_response})
+        self.assertEqual(response.status_code, 200)
