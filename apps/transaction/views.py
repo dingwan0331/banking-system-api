@@ -55,7 +55,6 @@ class TransactionView(View):
                 transaction_row = Transaction.objects.create(
                     amount        = amount,
                     balance       = balance,
-                    timestamp     = TimeTransform().get_now('int_unix_time'),
                     is_withdrawal = is_withdrawal,
                     summary       = summary,
                     account_id    = account_id
