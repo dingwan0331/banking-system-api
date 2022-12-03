@@ -3,6 +3,8 @@ import json
 
 from django.core.exceptions import ValidationError
 
+from apps.util.exception import AuthException
+
 class PostTransactionsJsonValidator:
     def __init__(self, body_json):
         data = json.loads(body_json)
@@ -24,7 +26,7 @@ class PostTransactionsJsonValidator:
         PASSWORD_REGEX = '\d{4}'
         
         if not re.fullmatch(PASSWORD_REGEX, self.password):
-            raise ValidationError('Invalid password')            
+            raise AuthException('Invalid password')            
 
     def __validate_is_withdrawal(self):
         if type(self.is_withdrawal) != bool:
