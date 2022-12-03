@@ -87,8 +87,6 @@ class TransactionView(View):
             return JsonResponse({'message':'Server error'}, status=500)
 
         except Exception as e:
-            
-            print(e.__class__)
             return JsonResponse({'message':'Server error'}, status=500)
     
     @validate_token
@@ -152,6 +150,5 @@ class TransactionView(View):
             return JsonResponse({'message' : 'Invalid account id'}, status=400)
 
         except Exception as e:
-            print(e)
             return JsonResponse({'message':'Server error'}, status=500)
         
