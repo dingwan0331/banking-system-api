@@ -11,6 +11,7 @@ from apps.transaction.models import Transaction, Account
 from apps.util.token         import validate_token
 from apps.util.transforms    import TimeTransform, GetTransactionsQueryTransform
 from apps.util.validators    import PostTransactionsJsonValidator
+from apps.util.exception     import AuthException
 
 class TransactionView(View):
     @validate_token
@@ -73,6 +74,9 @@ class TransactionView(View):
 
         except ValidationError as e:
             return JsonResponse({'message' : e.message}, status=400)
+        
+        except AuthException as e:
+            return JsonResponse({'message' : e.message}, status = e.status)
 
         except IntegrityError as e:
             if str(e) == 'CHECK constraint failed: credit':
