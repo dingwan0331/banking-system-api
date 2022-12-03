@@ -1,6 +1,7 @@
-from django.db import models
+from django.db    import models
 
 from apps.util.models import TimeStampModel
+
 # Create your models here.
 
 class Account(TimeStampModel):
@@ -12,6 +13,9 @@ class Account(TimeStampModel):
 
     class Meta():
         db_table = 'accounts'
+        constraints= [
+            models.CheckConstraint(name='accounts_balance_not_less_than_zero', check=models.Q(balance__gte=0)),
+        ]
 
 class AccountType(models.Model):
     id   = models.SmallAutoField(primary_key=True)
@@ -31,3 +35,13 @@ class Transaction(models.Model):
     class Meta():
         db_table = 'transactions'
         index_together = ['account', 'timestamp']
+        constraints= [
+            models.CheckConstraint(name='tansactions_amount_not_less_than_zero', check=models.Q(amount__gte=0)),
+            models.CheckConstraint(name='tansactions_balance_not_less_than_zero', check=models.Q(balance__gte=0)),
+            models.CheckConstraint(
+                name='timestamp_not_more_than_now', 
+                check=models.Q(
+                    timestamp__lte = 1000000 * (models.Func( models.functions.Now(), function="UNIXEPOCH")+10)
+                    )
+                )
+            ]
