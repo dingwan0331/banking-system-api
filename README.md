@@ -1,5 +1,11 @@
 # 8percent-coding-assignment-정진관
 
+배포 AWS EC2주소 http://3.34.188.98:8000
+
+사용 가상환경 miniconda
+
+python 버전정보 3.8
+
 # 패키지 설치 방법
 
 터미널 프로젝트 루트 폴더에서 아래의 명령어를 입력합니다.
@@ -26,6 +32,30 @@ Django TestCase를 이용하여 테스트코드를 작성하였습니다.
 
 python manage.py test --settings=config.settings.development
 
+```
+
+# 적재 데이터 정보
+
+평가의 편의성을 위헤 데이터 정보를 기재합니다.
+
+```
+user1: id=1, username='백병동', password='123456'
+
+user2: id=2, username='허병국', password='654321'
+
+account1: id=1, password='1234'
+
+account2: id=2, password='4321'
+
+user1_jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MX0.dq1ZWozu6YdboHMl0AhmDGqoPT_yI75_kDFgFTndo1w
+user2_jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mn0.eAHhb0yJoy9456zk5PMafAqGXlpzmsI3ctMkodjDmNQ
+```
+
+jwt는 만료기한이 없으므로 그대로 사용가능 합니다.
+
+```
+ex)
+request.headers('Authorization' : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mn0.eAHhb0yJoy9456zk5PMafAqGXlpzmsI3ctMkodjDmNQ')
 ```
 
 # Directory Structure
@@ -114,7 +144,9 @@ ex) 일반예금, 청약저축
 ### Transaction 테이블
 
 계좌의 거래정보를 관리하는 테이블입니다.
+
 제약조건: balance와 amount 그리고 timestamp는 0 이상이여야 합니다.
+
 인덱스: where문에 사용되는 account, timestamp를 복합인덱스로 사용하였습니다.
 
 - amount: 해당 거래에 거래된 금액입니다
@@ -128,6 +160,8 @@ ex) 일반예금, 청약저축
 ### 출,입금 api
 
 body값의 is_withdrawal 값을 이용하여 입,출금을 구분합니다.
+
+**한번의 트랜잭션 처리로 계좌의 잔액과 거래기록의 잔액의 무결성을 보장합니다.**
 
 1. 토큰이 없거나 잘못된 토큰일 시 401에러를 반환 합니다.
 2. 토큰에 담긴 id와 계좌의 user_id가 불일치시 403 에러를 반환합니다.
@@ -153,13 +187,6 @@ body = {
 
 **Response**
 
-거래일시 별 필터링, pagenation, 최신순&오래된순 조회가 가능합니다.
-(1900년도 이후의 거래만 조회가능합니다.)
-
-1. 토큰이 없거나 잘못된 토큰일 시 401에러를 반환 합니다.
-2. 토큰에 담긴 id와 계좌의 user_id가 불일치시 403 에러를 반환합니다.
-3. 1900년도 이후의 거래만 조회가능합니다.
-
 ```
 status = 201
 
@@ -170,6 +197,14 @@ response.json() = {
 ```
 
 ### 거래내역조회 api
+
+거래일시 별 필터링, pagenation, 최신순&오래된순 조회가 가능합니다.
+
+(1900년도 이후의 거래만 조회가능합니다.)
+
+1. 토큰이 없거나 잘못된 토큰일 시 401에러를 반환 합니다.
+2. 토큰에 담긴 id와 계좌의 user_id가 불일치시 403 에러를 반환합니다.
+3. 1900년도 이후의 거래만 조회가능합니다.
 
 **Request**
 
@@ -191,7 +226,6 @@ query_strings = {
 **Response**
 
 ```
-
 status = 200
 
 response.json() = [
@@ -204,4 +238,48 @@ response.json() = [
         }
     ]
 
+```
+
+### 회원가입 api
+
+**Request**
+
+```
+Post domain/auth/users
+
+body = {
+    "username" : str,
+    "password" : str,
+    "first_name" : str,
+    "last_name" : str
+    }
+```
+
+**Response**
+
+```
+status = 201
+
+response.json() = [ {'meesage' : 'Success'} ]
+```
+
+### 로그인 api
+
+**Request**
+
+```
+Post domain/auth/users/signin
+
+body = {
+    "username" : str,
+    "password" : str,
+    }
+```
+
+**Response**
+
+```
+status = 200
+
+response.json() =  {'access_token' : access_token}
 ```
