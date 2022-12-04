@@ -1,10 +1,9 @@
-import os 
+import os
 
 from pathlib import Path
 
 from dotenv import load_dotenv
 
-# load .env
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -48,5 +47,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+APPEND_SLASH = False
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
