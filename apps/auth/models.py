@@ -11,9 +11,6 @@ class User(TimeStampModel):
 
     class Meta():
         db_table = 'users'
-        constraints= [
-            models.CheckConstraint(name='users_credit_not_less_than_zero', check=models.Q(credit__gte=0)),
-        ]
         
     def __str__(self):
         return f'{self.name} ({self.pk})'
