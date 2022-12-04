@@ -49,7 +49,7 @@ class TransactionView(View):
                 balance = account.balance + signed_amount
 
                 if balance < 0:
-                    raise PermissionException('Insufficient balance')
+                    raise BadRequestException('Insufficient balance')
 
                 user.credit -= signed_amount
                 user.save()
