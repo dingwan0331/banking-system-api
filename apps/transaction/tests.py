@@ -342,7 +342,7 @@ class GetTransactionsTest(TestCase):
             timedelta         = timezone.timedelta(days=i)
             now               = timezone.datetime(2022,10,30)
             summary           = user.last_name + user.first_name
-            int_unix_time     = (now - timedelta).timestamp() * 1000000
+            int_unix_time     = (now - timedelta).timestamp()
 
             if i%2 ==0:
                 BALANCE -= amount
