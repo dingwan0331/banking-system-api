@@ -11,10 +11,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveConstraint(
-            model_name='transaction',
-            name='timestamp_not_more_than_now',
-        ),
+        # migrations.RemoveConstraint(
+        #     model_name='transaction',
+        #     name='timestamp_not_more_than_now',
+        # ),
         migrations.AlterField(
             model_name='transaction',
             name='timestamp',
