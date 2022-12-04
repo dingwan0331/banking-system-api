@@ -1,11 +1,12 @@
 from django.db    import models
+from django.utils import timezone
 
 from apps.util.models     import TimeStampModel
 from apps.util.transforms import TimeTransform
 
 # Create your models here.
 def time_now():
-    now = TimeTransform().unix_time_to_int()
+    now = TimeTransform().get_now()
     return now
 
 class Account(TimeStampModel):
@@ -32,7 +33,7 @@ class Transaction(models.Model):
     amount        = models.DecimalField(max_digits=19, decimal_places=4)
     balance       = models.DecimalField(max_digits=19, decimal_places=4)
     is_withdrawal = models.BooleanField()
-    timestamp     = models.PositiveBigIntegerField(default=time_now)
+    timestamp     = models.FloatField(default=time_now)
     summary       = models.CharField(max_length=20)
     account       = models.ForeignKey('Account', on_delete=models.PROTECT)
 
@@ -42,10 +43,5 @@ class Transaction(models.Model):
         constraints= [
             models.CheckConstraint(name='tansactions_amount_not_less_than_zero', check=models.Q(amount__gte=0)),
             models.CheckConstraint(name='tansactions_balance_not_less_than_zero', check=models.Q(balance__gte=0)),
-            models.CheckConstraint(
-                name='timestamp_not_more_than_now', 
-                check=models.Q(
-                    timestamp__lte = 1000000 * (models.Func( models.functions.Now(), function="UNIXEPOCH")+10)
-                    )
-                )
+            models.CheckConstraint(name='timestamp_not_lower_zero', check= models.Q(timestamp__gte = 0))
             ]
