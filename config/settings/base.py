@@ -17,10 +17,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.auth.apps.AuthConfig',
     'apps.transaction.apps.TransactionConfig',
-    'apps.util'
+    'apps.util',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,3 +52,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = False
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = (   
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
