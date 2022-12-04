@@ -1,13 +1,13 @@
-FROM python:3.8.15
+FROM python:3.8
 
-WORKDIR /usr/src/app 
+RUN mkdir /code
 
-COPY requirements.txt ./ 
+WORKDIR /code
 
-RUN pip install -r requirements.txt
+ADD ./requirements.txt /code/requirements.txt
 
-COPY . . 
+RUN pip install -r /code/requirements.txt
 
-EXPOSE 8000
+ADD . /code
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application"]
+CMD [ "gunicorn", "-b", "0.0.0.0:8000", "config.wsgi:application" ]
