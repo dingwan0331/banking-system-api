@@ -24,8 +24,8 @@ class Migration(migrations.Migration):
             model_name='transaction',
             constraint=models.CheckConstraint(check=models.Q(('balance__gte', 0)), name='tansactions_balance_not_less_than_zero'),
         ),
-        migrations.AddConstraint(
-            model_name='transaction',
-            constraint=models.CheckConstraint(check=models.Q(('timestamp__lte', django.db.models.expressions.CombinedExpression(models.Value(1000000), '*', django.db.models.expressions.CombinedExpression(models.Func(django.db.models.functions.datetime.Now(), function='UNIXEPOCH'), '+', models.Value(10))))), name='timestamp_not_more_than_now'),
-        ),
+        # migrations.AddConstraint(
+        #     model_name='transaction',
+        #     constraint=models.CheckConstraint(check=models.Q(('timestamp__lte', django.db.models.expressions.CombinedExpression(models.Value(1000000), '*', django.db.models.expressions.CombinedExpression(models.Func(django.db.models.functions.datetime.Now(), function='UNIXEPOCH'), '+', models.Value(10))))), name='timestamp_not_more_than_now'),
+        # ),
     ]
