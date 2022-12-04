@@ -15,18 +15,12 @@ class TimeTransform:
             self.unix_time = timezone.now().timestamp()
         elif type == 'str_date':
             self.unix_time = datetime.strptime(time, "%Y-%m-%d").timestamp()
-        elif type == 'int_unix_time':
-            self.unix_time = time / 1000000
         elif type == 'unix_time':
             self.unix_time = time
         elif type == 'datetime':
             self.unix_time = time.timestamp()
         else:
             raise TypeError('Unsupported type')
-
-    def unix_time_to_int(self):
-        self.unix_time *= 1000000
-        return self.unix_time
     
     def make_aware(self):
         return timezone.make_aware(datetime.fromtimestamp(self.unix_time))
@@ -99,10 +93,15 @@ class GetTransactionsQueryTransform:
         if not re.fullmatch(DATE_REGEX, self.start_date):
             raise BadRequestException('Invalid start date')
             
+        self.start_date = TimeTransform(self.start_date, 'str_date').unix_time
+            
     def __set_end_date(self):
         DATE_REGEX = '(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])'
+        
         if not self.end_date:
             self.end_date = TimeTransform().get_now('str_date')
 
         if not re.fullmatch(DATE_REGEX, self.end_date):
             raise BadRequestException('Invalid end date')
+        ONE_DAY = 86400
+        self.end_date = TimeTransform(self.end_date, 'str_date').unix_time + ONE_DAY
