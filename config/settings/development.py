@@ -11,8 +11,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-SECRET_KEY = 'a'
-
 LOGGING = {
     'disable_existing_loggers': False,
     'version': 1,
