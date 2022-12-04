@@ -108,11 +108,6 @@ class TransactionView(View):
             
             q = Q(account_id=account_id)
 
-            ONE_DAY = 86400000000
-            
-            start_date = TimeTransform(start_date, 'str_date').unix_time_to_int()
-            end_date = TimeTransform(end_date, 'str_date').unix_time_to_int() + ONE_DAY
-
             q &= Q(timestamp__gte=start_date) & Q(timestamp__lte=end_date)
 
             if transaction_type != 'all':
@@ -125,7 +120,7 @@ class TransactionView(View):
                     'amount'        : transaction.amount,
                     'balance'       : transaction.balance,
                     'summary'       : transaction.summary,
-                    'timestamp'     : TimeTransform(transaction.timestamp, 'int_unix_time').make_aware(),
+                    'timestamp'     : TimeTransform(transaction.timestamp).make_aware(),
                     'is_withdrawal' : transaction.is_withdrawal
                 } for transaction in transaction_rows
             ]
