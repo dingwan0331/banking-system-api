@@ -1,6 +1,4 @@
-# 8percent-coding-assignment-정진관
-
-배포 AWS EC2주소 http://3.34.188.98:8000
+# bangking-system-api
 
 사용 가상환경 miniconda
 
@@ -33,25 +31,6 @@ Django TestCase를 이용하여 테스트코드를 작성하였습니다.
 python manage.py test --settings=config.settings.development
 
 ```
-
-# 적재 데이터 정보
-
-평가의 편의성을 위헤 데이터 정보를 기재합니다.
-
-```
-user1: id=1, username='백병동', password='123456'
-
-user2: id=2, username='허병국', password='654321'
-
-account1: id=1, password='1234'
-
-account2: id=2, password='4321'
-
-user1_jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MX0.dq1ZWozu6YdboHMl0AhmDGqoPT_yI75_kDFgFTndo1w
-user2_jwt = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mn0.eAHhb0yJoy9456zk5PMafAqGXlpzmsI3ctMkodjDmNQ
-```
-
-jwt는 만료기한이 없으므로 그대로 사용가능 합니다.
 
 ```
 ex)
